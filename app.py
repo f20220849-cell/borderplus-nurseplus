@@ -24,8 +24,8 @@ import pandas as pd
 import streamlit as st
 
 import db
-from scorer import (CATEGORIES, CATEGORY_LABELS, LEARN_MODULE_MAP,
-                     score_note)
+from scorer import (CATEGORIES, CATEGORY_LABELS, CUE_TRANSLATIONS,
+                     LEARN_MODULE_MAP, VAGUE_PHRASE_TRANSLATIONS, score_note)
 from seed import run_seed
 
 st.set_page_config(
@@ -41,15 +41,35 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 st.markdown("""
 <style>
-    .stApp { background-color: #fafafa; }
-    h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
-    div[data-testid="stMetricValue"] { font-size: 1.6rem; }
+    /* Every rule below sets both background AND text color explicitly --
+       never just one -- so this can't go low-contrast regardless of the
+       visitor's OS/browser dark-mode setting. */
+    .stApp, .stApp p, .stApp span, .stApp label, .stApp div { color: #1a1a1a; }
+    .stApp { background-color: #ffffff; }
+    h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; color: #1a1a1a; }
+    div[data-testid="stMetricValue"] { font-size: 1.6rem; color: #1a1a1a; }
+    div[data-testid="stMetricLabel"] { color: #444444; }
     .risk-high { color: #b3261e; font-weight: 600; }
     .risk-medium { color: #97650f; font-weight: 600; }
     .risk-low { color: #2e7d32; font-weight: 600; }
-    .small-note { color: #5f6368; font-size: 0.85rem; }
+    .small-note { color: #444444; font-size: 0.85rem; }
     section[data-testid="stSidebar"] { background-color: #f1f3f4; }
-    .block-container { padding-top: 2rem; }
+    section[data-testid="stSidebar"] * { color: #1a1a1a !important; }
+    .block-container { padding-top: 1.5rem; max-width: 1150px; }
+    div[data-testid="stExpander"] { background-color: #ffffff; border: 1px solid #ddd; }
+    div[data-testid="stExpander"] * { color: #1a1a1a; }
+    code, .stCode, pre { color: #1a1a1a !important; background-color: #f1f3f4 !important; }
+    [data-testid="stCodeBlock"] * { color: #1a1a1a !important; }
+    /* Tabs: inactive tab labels default to a low-contrast theme color --
+       force both states explicitly. */
+    button[data-baseweb="tab"] { color: #1a1a1a !important; }
+    button[data-baseweb="tab"] p { color: #1a1a1a !important; }
+    div[data-baseweb="tab-highlight"] { background-color: #b3261e !important; }
+    /* Charts (st.bar_chart / st.line_chart use vega-lite under the hood,
+       which inherits a dark template if the browser is in dark mode --
+       force a white chart background + dark axis text regardless. */
+    div[data-testid="stVegaLiteChart"] { background-color: #ffffff !important; }
+    div[data-testid="stVegaLiteChart"] canvas { background-color: #ffffff !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -113,8 +133,14 @@ if page == "Submit a Care Note":
             "Koerperpflege wie gewohnt durchgefuehrt. Mittagessen teilweise "
             "gegessen. Keine Besonderheiten."
         )
+        sample_en = (
+            "(English: \"Patient seems tired today. Blood pressure was not "
+            "measured. Personal care done as usual. Lunch partly eaten. "
+            "Nothing notable.\")"
+        )
         text = st.text_area(
-            "Care note text (German)",
+            "Care note text (German -- this is the language real shift "
+            "reports are written in)",
             value="",
             height=220,
             placeholder=sample,
@@ -122,6 +148,7 @@ if page == "Submit a Care Note":
         use_sample = st.checkbox("Use example note instead")
         if use_sample:
             text = sample
+            st.caption(sample_en)
 
         submit = st.button("Score this note", type="primary")
 
@@ -160,7 +187,11 @@ if page == "Submit a Care Note":
             if rd["vague_phrases_found"]:
                 st.markdown("**Vague phrasing detected:**")
                 for p in rd["vague_phrases_found"]:
-                    st.markdown(f"- \u201c{p}\u201d \u2014 lacks a measurable observation behind it")
+                    gloss = VAGUE_PHRASE_TRANSLATIONS.get(p, "")
+                    st.markdown(
+                        f"- \u201c{p}\u201d (\u201c{gloss}\u201d) \u2014 "
+                        f"asserts a state with no measurable detail behind it"
+                    )
 
             if rd["measurable_anchors"]:
                 st.markdown(
@@ -356,7 +387,11 @@ elif page == "Rubric Reference":
     )
     for cat, cues in CATEGORIES.items():
         with st.expander(CATEGORY_LABELS[cat]):
-            st.code(", ".join(cues), language=None)
+            cue_df = pd.DataFrame({
+                "German term in note": [c.strip() for c in cues],
+                "What it means": [CUE_TRANSLATIONS.get(c, "-") for c in cues],
+            })
+            st.dataframe(cue_df, hide_index=True, use_container_width=True)
 
     st.subheader("2. Specificity (40% of overall score)")
     st.write(
