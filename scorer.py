@@ -88,6 +88,19 @@ VAGUE_PHRASES = [
     "normal verlaufen",
 ]
 
+VAGUE_PHRASE_TRANSLATIONS = {
+    "wie gewohnt": "as usual",
+    "alles in ordnung": "everything fine",
+    "es geht ihm gut": "he is doing well",
+    "es geht ihr gut": "she is doing well",
+    "keine besonderheiten": "nothing notable",
+    "patient ist zufrieden": "patient is content",
+    "soweit gut": "fine so far",
+    "unauffaellig": "unremarkable",
+    "unauffällig": "unremarkable",
+    "normal verlaufen": "went normally",
+}
+
 # A note that contains a number+unit pair is doing the thing vague notes
 # don't: anchoring a claim to something measurable (130/85, 36.8, 14:00,
 # 200ml, 5mg, NRS 3/10, etc).
@@ -218,4 +231,42 @@ LEARN_MODULE_MAP = {
     "pain": "Module: Standardized pain scales (NRS) in German charting",
     "incidents": "Module: Incident/Besonderheiten reporting & escalation language",
     "specificity": "Module: Replacing vague phrasing with measurable observations",
+}
+
+# English gloss for every German cue word used in CATEGORIES, so the rubric
+# page is readable by someone who doesn't speak German -- the tool checks
+# German text (that's the language the actual documentation is written in)
+# but explaining *why* a term matters shouldn't require knowing German.
+CUE_TRANSLATIONS = {
+    "blutdruck": "blood pressure", "rr ": "RR (blood pressure shorthand)",
+    "puls": "pulse", "temperatur": "temperature", "fieber": "fever",
+    "atmung": "breathing", "sauerstoffsaettigung": "oxygen saturation",
+    "spo2": "SpO2 (oxygen saturation)", "herzfrequenz": "heart rate",
+    "bz ": "BZ (blood sugar shorthand)", "blutzucker": "blood sugar",
+    "mobilisation": "mobilisation", "mobilisiert": "mobilised",
+    "gehhilfe": "walking aid", "rollstuhl": "wheelchair",
+    "gelaufen": "walked", "bettlaegerig": "bedbound", "transfer": "transfer",
+    "lagerung": "positioning", "umgelagert": "repositioned", "sturz": "fall",
+    "koerperpflege": "personal hygiene care", "körperpflege": "personal hygiene care",
+    "gewaschen": "washed", "dusche": "shower", "geduscht": "showered",
+    "intimpflege": "intimate hygiene care", "mundpflege": "oral care",
+    "rasiert": "shaved", "angezogen": "dressed",
+    "nahrung": "food/nutrition", "ernaehrung": "nutrition", "ernährung": "nutrition",
+    "appetit": "appetite", "getrunken": "drank", "trinkmenge": "fluid intake amount",
+    "fluessigkeit": "fluid", "flüssigkeit": "fluid", "sondenkost": "tube feeding",
+    "diaet": "diet", "diät": "diet", "kost": "diet/meals",
+    "wunde": "wound", "verband": "bandage/dressing", "wundversorgung": "wound care",
+    "dekubitus": "pressure ulcer", "verbandwechsel": "dressing change",
+    "wundheilung": "wound healing", "naht": "stitches/suture", "pflaster": "plaster/adhesive bandage",
+    "medikament": "medication", "schmerzmittel": "painkiller", "tablette": "tablet/pill",
+    "spritze": "injection", "insulin": "insulin", "verabreicht": "administered",
+    "gabe um": "given at (time)", "uhr verabreicht": "administered at (time)",
+    "tropfen": "drops",
+    "schmerz": "pain", "schmerzskala": "pain scale", "nrs": "NRS pain scale",
+    "klagt ueber": "complains of", "klagt über": "complains of",
+    "schmerzfrei": "pain-free", "analgetikum": "analgesic",
+    "auffaelligkeit": "abnormality/concern", "auffälligkeit": "abnormality/concern",
+    "besonderheit": "notable event", "verweigert": "refused",
+    "unruhe": "agitation/restlessness", "verwirrt": "confused",
+    "notfall": "emergency", "arzt informiert": "doctor informed",
 }
